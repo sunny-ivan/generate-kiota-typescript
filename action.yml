@@ -24,9 +24,6 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
     - name: Get sha of local Graph metadata
       id: previous_apisha
       shell: bash
