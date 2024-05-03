@@ -65,9 +65,10 @@ runs:
       id: remote_kiota_ver
       shell: bash
       run: |
-        version_v=$( curl -Lo- https://api.github.com/repos/microsoft/kiota/releases/latest | \
+        original_ver=$( curl -Lo- https://api.github.com/repos/microsoft/kiota/releases/latest | \
         python3 -c "import sys, json; print(json.load(sys.stdin)['name'])") # v1.13.0
-        remote_kiota_ver=${version_v#v} # 1.13.0
+        remote_kiota_ver=${original_ver#v} # 1.13.0
+        echo "original_ver=$original_ver" >> $GITHUB_OUTPUT
         echo "remote_kiota_ver=$remote_kiota_ver" >> $GITHUB_OUTPUT
         echo "$remote_kiota_ver"
 
@@ -171,7 +172,7 @@ runs:
       run: |
         work_folder=$(pwd)
         cd $(mktemp -d)
-        curl --location --output kiota-x64.zip https://aka.ms/get/kiota/latest/linux-x64.zip
+        curl --location --output kiota-x64.zip https://github.com/microsoft/kiota/releases/download/${{ steps.remote_kiota_ver.outputs.original_ver }}/linux-x64.zip
         unzip kiota-x64.zip
         installed_path=$(pwd)
         echo "installed_path=$installed_path" >> $GITHUB_OUTPUT
