@@ -103,7 +103,7 @@ runs:
       id: cur_input
       shell: bash
       run: |
-        cur_input=echo "${{ inputs.openapi_description_uri }},${{ inputs.kiota_generate_options }}" | sha1sum | cut -d ' ' -f1
+        cur_input=$(echo "${{ inputs.openapi_description_uri }},${{ inputs.kiota_generate_options }}" | sha1sum | cut -d ' ' -f1)
         echo "cur_input=$cur_input" >> $GITHUB_OUTPUT
         echo "$cur_input"
 
