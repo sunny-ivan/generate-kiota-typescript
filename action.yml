@@ -229,7 +229,7 @@ runs:
       if: ${{ steps.should_build.outputs.should_build == '1' }}
       shell: bash
       run: |
-        npm build
+        npm run build
 
     - name: Check SHA-1 of distribution
       id: check_dist_sha1
