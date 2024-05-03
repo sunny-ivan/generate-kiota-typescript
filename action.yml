@@ -6,7 +6,7 @@ inputs:
     description: "The URI to the OpenAPI description file used to generate the code files"
     required: true
     default: "https://aka.ms/graph/v1.0/openapi.yaml"
-  kiota-options:
+  kiota_generate_options:
     description: "Options to pass to kiota"
     required: false
 
@@ -103,7 +103,7 @@ runs:
       id: cur_input
       shell: bash
       run: |
-        cur_input=echo "${{ inputs.openapi_description_uri }},${{ inputs.kiota-options }}" | sha1sum | cut -d ' ' -f1
+        cur_input=echo "${{ inputs.openapi_description_uri }},${{ inputs.kiota_generate_options }}" | sha1sum | cut -d ' ' -f1
         echo "cur_input=$cur_input" >> $GITHUB_OUTPUT
         echo "$cur_input"
 
@@ -186,7 +186,7 @@ runs:
       shell: bash
       if: ${{ steps.should_build.outputs.should_build == '1' }}
       run: |
-        rm -rf './src' & "${{ steps.setup_kiota.outputs.installed_path }}/kiota" generate --language TypeScript --output src --class-name GraphExcelClient --openapi data/openapi.yaml ${{ inputs.kiota-options }}
+        rm -rf './src' & "${{ steps.setup_kiota.outputs.installed_path }}/kiota" generate --language TypeScript --output src --class-name GraphExcelClient --openapi data/openapi.yaml ${{ inputs.kiota_generate_options }}
 
     - name: Install dependencies of Kiota generated client
       shell: bash
