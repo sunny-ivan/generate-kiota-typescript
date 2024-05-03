@@ -2,7 +2,7 @@ name: Generate kiota-typescript
 description: Unofficial automatic generator for kiota-typescript
 
 inputs:
-  openapi-description-uri:
+  openapi_description_uri:
     description: "The URI to the OpenAPI description file used to generate the code files"
     required: true
     default: "https://aka.ms/graph/v1.0/openapi.yaml"
@@ -46,7 +46,7 @@ runs:
       shell: bash
       run: |
         mkdir -p data && cd data
-        curl --location --output openapi.yaml "${{ inputs.openapi-description-uri }}"
+        curl --location --output openapi.yaml "${{ inputs.openapi_description_uri }}"
         remote_apisha=$(sha1sum openapi.yaml | cut -d ' ' -f1)
         echo "$remote_apisha" >> openapi.sha
         cd ..
@@ -103,7 +103,7 @@ runs:
       id: cur_input
       shell: bash
       run: |
-        cur_input=echo "${{ inputs.openapi-description-uri }},${{ inputs.kiota-options }}" | sha1sum | cut -d ' ' -f1
+        cur_input=echo "${{ inputs.openapi_description_uri }},${{ inputs.kiota-options }}" | sha1sum | cut -d ' ' -f1
         echo "cur_input=$cur_input" >> $GITHUB_OUTPUT
         echo "$cur_input"
 
