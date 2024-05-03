@@ -40,7 +40,7 @@ runs:
       shell: bash
       run: |
         mkdir -p data && cd data
-        curl --location --output openapi.yaml https://aka.ms/graph/v1.0/openapi.yaml
+        curl --location --output openapi.yaml ${{ inputs.openapi-description-uri }}
         remote_apisha=$(sha1sum openapi.yaml | cut -d ' ' -f1)
         echo "$remote_apisha" >> openapi.sha
         cd ..
@@ -93,11 +93,44 @@ runs:
           echo "KIOTA_UPDATED=1" >> $GITHUB_ENV
         fi
 
+    - name: Current input options
+      id: cur_input
+      shell: bash
+      run: |
+        cur_input=echo "${{ inputs.openapi-description-uri }},${{ inputs.kiota-options }}" | sha1sum | cut -d ' ' -f1
+        echo "cur_input=$cur_input" >> $GITHUB_OUTPUT
+        echo "$cur_input"
+
+    - name: Last input options
+      id: last_input
+      shell: bash
+      run: |
+        LOCAL_FILE="data/last_input.sha1"
+        last_input="empty"
+        if test -f $LOCAL_FILE; then
+          last_input=$(cat $LOCAL_FILE)
+          echo "last_input=$last_input" >> $GITHUB_OUTPUT
+        else
+          echo "kiota.ver does not exist, it will be created later."
+        fi
+        echo "$last_input"
+
+    - name: Compare input options
+      shell: bash
+      run: |
+        if [ "${{ steps.cur_input.outputs.cur_input }}" == "${{ steps.last_input.outputs.last_input }}" ]; then
+          echo "Local Kiota is the latest version"
+          echo "OPTIONS_UPDATED=0" >> $GITHUB_ENV
+        else
+          echo "Local Kiota is not the latest version"
+          echo "OPTIONS_UPDATED=1" >> $GITHUB_ENV
+        fi
+
     - name: Check before building
       id: should_build
       shell: bash
       run: |
-        if [ "$METADATA_UPDATED" = "1" ] || [ "$KIOTA_UPDATED" = "1"]; then
+        if [ "$METADATA_UPDATED" = "1" ] || [ "$KIOTA_UPDATED" = "1" || [ "$OPTIONS_UPDATED" = "1"]; then
           echo "At least one updated."
           echo "should_build=1" >> $GITHUB_OUTPUT
         else
@@ -111,6 +144,7 @@ runs:
       run: |
         mkdir -p data && cd data
         echo "${{ steps.remote_kiota_ver.outputs.remote_kiota_ver }}" > kiota.ver
+        echo "${{ steps.cur_input.outputs.cur_input }}" > last_input.sha1
         cd ..
 
     - name: Setup Node.js environment
