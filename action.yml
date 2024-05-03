@@ -258,6 +258,4 @@ runs:
           cd ..
           echo "should_tag=1" >> $GITHUB_OUTPUT
         fi
-        ver=$(npm pkg get version)
-        ver=${ver//\"/}
         echo "ver=$ver" >> $GITHUB_OUTPUT
