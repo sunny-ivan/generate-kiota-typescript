@@ -184,7 +184,7 @@ runs:
       shell: bash
       if: ${{ steps.should_build.outputs.should_build == '1' }}
       run: |
-        rm -rf './src' & "${{ steps.setup_kiota.outputs.installed_path }}/kiota" generate --language TypeScript --output src --class-name GraphExcelClient --openapi data/openapi.yaml ${{ inputs.kiota_generate_options }}
+        rm -rf './src' & "${{ steps.setup_kiota.outputs.installed_path }}/kiota" generate --language TypeScript --output src --openapi data/openapi.yaml ${{ inputs.kiota_generate_options }}
 
     - name: Install dependencies of Kiota generated client
       shell: bash
