@@ -17,6 +17,9 @@ outputs:
   remote_kiota_ver:
     description: "Latest Kiota version"
     value: ${{ steps.remote_kiota_ver.outputs.remote_kiota_ver }}
+  suggested_pkg_version:
+    description: "Suggested package version for tag usage"
+    value: ${{ steps.check_dist_sha1.outputs.ver }}
 
 runs:
   using: "composite"
