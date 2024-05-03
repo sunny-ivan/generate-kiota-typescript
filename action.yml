@@ -227,16 +227,6 @@ runs:
       run: |
         yarn install
 
-    - name: Set identity
-      if: ${{ steps.should_build.outputs.should_build == '1' }}
-      shell: bash
-      run: |
-        # git config --global user.name "$GITHUB_ACTOR"
-        # git config --global user.email "$GITHUB_ACTOR_ID+$GITHUB_ACTOR@users.noreply.github.com"
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        echo Commit as "$(git config user.name) <$(git config user.email)>"
-
     - name: Build package
       if: ${{ steps.should_build.outputs.should_build == '1' }}
       shell: bash
