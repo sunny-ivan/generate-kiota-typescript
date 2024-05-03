@@ -1,5 +1,5 @@
-name: Generate SDK Weekly
-description: Generate
+name: Generate kiota-typescript
+description: Unofficial automatic generator for kiota-typescript
 
 inputs:
   openapi-description-uri:
