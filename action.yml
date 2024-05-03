@@ -199,7 +199,7 @@ runs:
         echo $install_packages
         eval $install_packages
 
-    - name: Local package version
+    - name: Previous package version
       id: previous_package_ver
       if: ${{ steps.should_build.outputs.should_build == '1' }}
       shell: bash
@@ -209,7 +209,7 @@ runs:
         echo "ver=$ver" >> $GITHUB_OUTPUT
         echo $ver
 
-    - name: Set version
+    - name: Next package version
       id: next_ver
       if: ${{ steps.should_build.outputs.should_build == '1' }}
       shell: bash
@@ -246,11 +246,13 @@ runs:
           echo "dist.sha1 does not exist, it will be created later."
         fi
         echo "$last_sha1"
+        ver=${{ steps.previous_package_ver.outputs.ver }}
         if [ "$cur_sha1" == "$last_sha1" ]; then
           echo "Same as previous building."
           echo "should_tag=0" >> $GITHUB_OUTPUT
         else
           echo "This is a new version."
+          ver=${{ steps.next_ver.outputs.ver }}
           mkdir -p data && cd data
           echo "$cur_sha1" > dist.sha1
           cd ..
