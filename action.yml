@@ -40,7 +40,7 @@ runs:
       shell: bash
       run: |
         mkdir -p data && cd data
-        curl --location --output openapi.yaml ${{ inputs.openapi-description-uri }}
+        curl --location --output openapi.yaml "${{ inputs.openapi-description-uri }}"
         remote_apisha=$(sha1sum openapi.yaml | cut -d ' ' -f1)
         echo "$remote_apisha" >> openapi.sha
         cd ..
