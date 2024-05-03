@@ -218,7 +218,6 @@ runs:
       run: |
         python3 -m pip install semantic-version
         ver="$(python3 -c "import semantic_version; kiota_v = semantic_version.Version('${{ steps.remote_kiota_ver.outputs.remote_kiota_ver }}'); local_v = semantic_version.Version('${{ steps.previous_package_ver.outputs.ver }}'); print(local_v.next_patch() if kiota_v.major==local_v.major and kiota_v.minor==local_v.minor else kiota_v)")"
-        npm pkg set version=$ver
         echo "ver=$ver" >> $GITHUB_OUTPUT
         echo $ver
 
@@ -261,7 +260,6 @@ runs:
         echo "$last_sha1"
         if [ "$cur_sha1" == "$last_sha1" ]; then
           echo "Same as previous building."
-          npm pkg set version=${{ steps.previous_package_ver.outputs.ver }}
           echo "should_tag=0" >> $GITHUB_OUTPUT
         else
           echo "This is a new version."
