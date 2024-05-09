@@ -53,7 +53,7 @@ data
 ```yaml
 - name: Generate Kiota client
   id: generate
-  uses: sunny-ivan/generate-kiota-typescript@main
+  uses: sunny-ivan/generate-kiota-typescript@v1 # Use the latest version if available
   with:
     kiota_generate_options: --class-name CustomClient --include-path **/foo/** --include-path **/bar/**
 ```
