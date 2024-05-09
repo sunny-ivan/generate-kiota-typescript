@@ -1,6 +1,10 @@
 name: Generate kiota-typescript
 description: Unofficial automatic generator for kiota-typescript
 
+branding:
+  color: blue
+  icon: box
+
 inputs:
   openapi_description_uri:
     description: "The URI to the OpenAPI description file used to generate the code files"
