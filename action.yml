@@ -202,12 +202,17 @@ runs:
         ls -lR
         cd $work_folder
 
+    - name: Install or update TypeScript
+      shell: bash
+      if: ${{ steps.should_build.outputs.should_build == '1' }}
+      run: npm install typescript@latest --save-dev
+
     - name: Generate client with Kiota
       shell: bash
       if: ${{ steps.should_build.outputs.should_build == '1' }}
       run: |
         rm -rf './src' & "${{ steps.setup_kiota.outputs.installed_path }}/kiota" generate --language TypeScript --output src --openapi data/openapi.yaml ${{ inputs.kiota_generate_options }}
-
+    
     - name: Install dependencies of Kiota generated client
       shell: bash
       if: ${{ steps.should_build.outputs.should_build == '1' }}
