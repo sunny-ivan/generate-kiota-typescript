@@ -242,7 +242,7 @@ runs:
       shell: bash
       run: |
         python3 -m pip install semantic-version
-        python3 ${{ github.action_path }}/next_package_ver.py '${{ steps.remote_kiota_ver.outputs.remote_kiota_ver }}' '${{ steps.previous_package_ver.outputs.ver }}'
+        ver=$(python3 ${{ github.action_path }}/next_package_ver.py '${{ steps.remote_kiota_ver.outputs.remote_kiota_ver }}' '${{ steps.previous_package_ver.outputs.ver }}')
         echo "ver=$ver" >> $GITHUB_OUTPUT
         echo $ver
 
