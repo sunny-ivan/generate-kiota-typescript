@@ -182,6 +182,11 @@ runs:
     #     echo "Installing $yarn_version"
     #     yarn set version "$yarn_version"
 
+    - name: Uninstall outdated packages
+      run: node ${{ github.action_path }}/remove-kiota-packages.js
+      shell: bash
+      if: ${{ steps.should_build.outputs.should_build == '1' }}
+
     - name: Setup Kiota
       id: setup_kiota
       if: ${{ steps.should_build.outputs.should_build == '1' }}
@@ -196,11 +201,6 @@ runs:
         echo Kiota installed at $installed_path
         ls -lR
         cd $work_folder
-
-    - name: Uninstall outdated packages
-      run: remove-kiota-packages.js
-      shell: node
-      if: ${{ steps.should_build.outputs.should_build == '1' }}
 
     - name: Generate client with Kiota
       shell: bash
