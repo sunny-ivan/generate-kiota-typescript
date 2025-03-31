@@ -13,6 +13,10 @@ inputs:
   kiota_generate_options:
     description: "Options to pass to kiota"
     required: false
+  specified_kiota_version:
+    description: "If specified, the latest Kiota will be ignored and the version provided by this option will be used."
+    required: false
+    default: ""
 
 outputs:
   should_tag:
@@ -69,12 +73,21 @@ runs:
       id: remote_kiota_ver
       shell: bash
       run: |
-        original_ver=$( curl -Lo- https://api.github.com/repos/microsoft/kiota/releases/latest | \
-        python3 -c "import sys, json; print(json.load(sys.stdin)['name'])") # v1.13.0
-        remote_kiota_ver=${original_ver#v} # 1.13.0
-        echo "original_ver=$original_ver" >> $GITHUB_OUTPUT
-        echo "remote_kiota_ver=$remote_kiota_ver" >> $GITHUB_OUTPUT
-        echo "$remote_kiota_ver"
+        if [ -z "${{ inputs.specified_kiota_version }}" ]; then
+          original_ver=$( curl -Lo- https://api.github.com/repos/microsoft/kiota/releases/latest | \
+          python3 -c "import sys, json; print(json.load(sys.stdin)['name'])") # v1.13.0
+          remote_kiota_ver=${original_ver#v} # 1.13.0
+          echo "original_ver=$original_ver" >> $GITHUB_OUTPUT
+          echo "remote_kiota_ver=$remote_kiota_ver" >> $GITHUB_OUTPUT
+          echo "$remote_kiota_ver"
+        else
+          echo "You have specified the version of Kiota"
+          original_ver="${{ inputs.specified_kiota_version }}"
+          remote_kiota_ver=${original_ver#v} # 1.13.0
+          echo "original_ver=$original_ver" >> $GITHUB_OUTPUT
+          echo "remote_kiota_ver=$remote_kiota_ver" >> $GITHUB_OUTPUT
+          echo "$remote_kiota_ver"
+        fi
 
     - name: Last Kiota's version
       id: last_kiota_ver
@@ -190,6 +203,14 @@ runs:
       run: |
         rm -rf './src' & "${{ steps.setup_kiota.outputs.installed_path }}/kiota" generate --language TypeScript --output src --openapi data/openapi.yaml ${{ inputs.kiota_generate_options }}
 
+    - name: Uninstall outdated packages
+      shell: bash
+      if: ${{ steps.should_build.outputs.should_build == '1' }}
+      run: |
+        uninstall_packages=$(npm ls --depth=0 --parseable | sed -e 's/\\/\//g' -e 's#/\+$##' -e 's#.*/##' | grep '^kiota-' | sort -u)
+        echo "Uninstalling packages: $uninstall_packages"
+        npm uninstall $uninstall_packages   
+
     - name: Install dependencies of Kiota generated client
       shell: bash
       if: ${{ steps.should_build.outputs.should_build == '1' }}
@@ -219,7 +240,7 @@ runs:
       shell: bash
       run: |
         python3 -m pip install semantic-version
-        ver="$(python3 -c "import semantic_version; kiota_v = semantic_version.Version('${{ steps.remote_kiota_ver.outputs.remote_kiota_ver }}'); local_v = semantic_version.Version('${{ steps.previous_package_ver.outputs.ver }}'); print(local_v.next_patch() if kiota_v.major==local_v.major and kiota_v.minor==local_v.minor else kiota_v)")"
+        ver="$(python3 -c "import datetime; import semantic_version; kiota_v = semantic_version.Version('${{ steps.remote_kiota_ver.outputs.remote_kiota_ver }}'); local_v = semantic_version.Version('${{ steps.previous_package_ver.outputs.ver }}'); print(str(kiota_v.next_patch())+'.fallback'+datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%d") if kiota_v.major < local_v.major or kiota_v.minor < local_v.minor else (local_v.next_patch() if kiota_v.major==local_v.major and kiota_v.minor==local_v.minor else kiota_v))")"
         echo "ver=$ver" >> $GITHUB_OUTPUT
         echo $ver
 
