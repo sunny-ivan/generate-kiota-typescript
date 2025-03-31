@@ -197,19 +197,16 @@ runs:
         ls -lR
         cd $work_folder
 
+    - name: Uninstall outdated packages
+      run: remove-kiota-packages.js
+      shell: node
+      if: ${{ steps.should_build.outputs.should_build == '1' }}
+
     - name: Generate client with Kiota
       shell: bash
       if: ${{ steps.should_build.outputs.should_build == '1' }}
       run: |
         rm -rf './src' & "${{ steps.setup_kiota.outputs.installed_path }}/kiota" generate --language TypeScript --output src --openapi data/openapi.yaml ${{ inputs.kiota_generate_options }}
-
-    - name: Uninstall outdated packages
-      shell: bash
-      if: ${{ steps.should_build.outputs.should_build == '1' }}
-      run: |
-        uninstall_packages=$(npm ls --depth=0 --parseable | sed -e 's/\\/\//g' -e 's#/\+$##' -e 's#.*/##' | grep '^kiota-' | sort -u)
-        echo "Uninstalling packages: $uninstall_packages"
-        npm uninstall $uninstall_packages   
 
     - name: Install dependencies of Kiota generated client
       shell: bash
