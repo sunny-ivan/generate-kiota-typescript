@@ -242,7 +242,7 @@ runs:
       shell: bash
       run: |
         python3 -m pip install semantic-version
-        ver="$(python3 -c "import datetime; import semantic_version; kiota_v = semantic_version.Version('${{ steps.remote_kiota_ver.outputs.remote_kiota_ver }}'); local_v = semantic_version.Version('${{ steps.previous_package_ver.outputs.ver }}'); print(str(kiota_v.next_patch())+'.fallback'+datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%d") if kiota_v.major < local_v.major or kiota_v.minor < local_v.minor else (local_v.next_patch() if kiota_v.major==local_v.major and kiota_v.minor==local_v.minor else kiota_v))")"
+        python3 ${{ github.action_path }}/next_package_ver.py '${{ steps.remote_kiota_ver.outputs.remote_kiota_ver }}' '${{ steps.previous_package_ver.outputs.ver }}'
         echo "ver=$ver" >> $GITHUB_OUTPUT
         echo $ver
 
